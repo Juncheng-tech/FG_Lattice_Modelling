@@ -1,7 +1,14 @@
 Current task: Begin the coding-based modelling work in PyCharm.
+
 Paper: Topology optimisation for design and additive manufacturing of functionally graded lattice structures using derivative-aware machine learning algorithms.
+
 Team member: Hanrui.
+
 Current question: Whether the modelling work should reproduce the full paper or mainly focus on the machine learning part.
-use a simple neural network to predict material-related outputs from input parameters
+
+Initial modelling idea: Use a simple neural network to predict material-related outputs from input parameters.
+
 Progress update:
 A simple neural network model was created in PyCharm and tested with dummy data as the first step of the modelling work.
+The code ran successfully, and the initial MSE result was 0.08075037529414072.
+Comments were added to improve code readability.
