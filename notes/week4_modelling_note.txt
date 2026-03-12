@@ -1,0 +1,4 @@
+Current task: Begin the coding-based modelling work in PyCharm.
+Paper: Topology optimisation for design and additive manufacturing of functionally graded lattice structures using derivative-aware machine learning algorithms.
+Team member: Hanrui.
+Current question: Whether the modelling work should reproduce the full paper or mainly focus on the machine learning part.
