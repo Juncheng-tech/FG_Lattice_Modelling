@@ -51,21 +51,35 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # Training process
 epochs = 500
-loss_history = []
+train_loss_history = []
+val_loss_history = []
 
 for epoch in range(epochs):
+    # Training step
     model.train()
-    pred = model(X_train)
-    loss = criterion(pred, y_train)
+    train_pred = model(X_train)
+    train_loss = criterion(train_pred, y_train)
 
     optimizer.zero_grad()
-    loss.backward()
+    train_loss.backward()
     optimizer.step()
 
-    loss_history.append(loss.item())
+    # Validation step
+    model.eval()
+    with torch.no_grad():
+        val_pred = model(X_val)
+        val_loss = criterion(val_pred, y_val)
+
+    # Save loss values
+    train_loss_history.append(train_loss.item())
+    val_loss_history.append(val_loss.item())
 
     if (epoch + 1) % 50 == 0:
-        print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.6f}")
+        print(
+            f"Epoch [{epoch+1}/{epochs}], "
+            f"Train Loss: {train_loss.item():.6f}, "
+            f"Val Loss: {val_loss.item():.6f}"
+        )
 
 # Model evaluation
 model.eval()
@@ -86,10 +100,12 @@ with open("results/training_results.txt", "w") as f:
 
 # Plot and save training loss curve
 plt.figure(figsize=(8, 5))
-plt.plot(loss_history)
+plt.plot(train_loss_history, label="Training Loss")
+plt.plot(val_loss_history, label="Validation Loss")
 plt.xlabel("Epoch")
-plt.ylabel("Training Loss")
-plt.title("Training Loss Curve")
+plt.ylabel("Loss")
+plt.title("Training and Validation Loss Curve")
+plt.legend()
 plt.grid(True)
 plt.savefig("results/loss_curve.png")
 plt.show()
