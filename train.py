@@ -37,8 +37,11 @@ y_val = y_scaler.transform(y_val)
 y_test = y_scaler.transform(y_test)
 # Convert numpy arrays to PyTorch tensors
 X_train = torch.tensor(X_train, dtype=torch.float32)
+X_val = torch.tensor(X_val, dtype=torch.float32)
 X_test = torch.tensor(X_test, dtype=torch.float32)
+
 y_train = torch.tensor(y_train, dtype=torch.float32)
+y_val = torch.tensor(y_val, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.float32)
 
 # Initialize MLP model, loss function and optimizer
