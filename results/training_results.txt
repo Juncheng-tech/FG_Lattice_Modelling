@@ -2,4 +2,4 @@ Week 5 basic reproduction result
 Model: Basic MLP
 Task: Input parameters to material-related outputs
 Training status: Completed
-Test MSE: 0.11250531673431396
+Test MSE: 0.11337020248174667

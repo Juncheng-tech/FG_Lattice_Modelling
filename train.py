@@ -13,20 +13,28 @@ df = pd.read_csv("data/dataset.csv")
 X = df[["cell_size_mm", "strut_diameter_mm", "porosity", "gradation_index"]].values
 y = df[["E_xx_GPa", "E_yy_GPa"]].values
 
-# Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+# training+validation and test
+X_temp, X_test, y_temp, y_test = train_test_split(
+    X, y, test_size=0.15, random_state=42
 )
+
+#  training and validation
+X_train, X_val, y_train, y_val = train_test_split(
+    X_temp, y_temp, test_size=0.1765, random_state=42
+)
+# 0.1765 of 85% ≈ 15% of total
 
 # Standardize input and output data
 x_scaler = StandardScaler()
 y_scaler = StandardScaler()
 
 X_train = x_scaler.fit_transform(X_train)
+X_val = x_scaler.transform(X_val)
 X_test = x_scaler.transform(X_test)
-y_train = y_scaler.fit_transform(y_train)
-y_test = y_scaler.transform(y_test)
 
+y_train = y_scaler.fit_transform(y_train)
+y_val = y_scaler.transform(y_val)
+y_test = y_scaler.transform(y_test)
 # Convert numpy arrays to PyTorch tensors
 X_train = torch.tensor(X_train, dtype=torch.float32)
 X_test = torch.tensor(X_test, dtype=torch.float32)

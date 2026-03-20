@@ -1,2 +1,4 @@
 week 6 starts
 The goal of this stage is to extend the current basic model into a comparison framework, generate more meaningful figures, and provide stronger evidence for the reproduction work.
+Number of hidden layer neurons, default is 50.
+activation_name="relu" This specifies the activation function, which defaults to ReLU.
