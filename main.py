@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_squared_error
-
+from train import *
 # Step 1: create dummy input data
 # Example: 100 samples, 4 input features
 X = np.random.rand(100, 4)
@@ -33,3 +33,4 @@ y_pred = model.predict(X_test)
 mse = mean_squared_error(y_test, y_pred)
 print("Model training completed.")
 print("MSE:", mse)
+print("Week 5 basic model training finished.")
