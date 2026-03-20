@@ -1,1 +1,2 @@
 week 6 starts
+The goal of this stage is to extend the current basic model into a comparison framework, generate more meaningful figures, and provide stronger evidence for the reproduction work.
