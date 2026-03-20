@@ -6,19 +6,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from model.mlp_model import MLPModel
 
-# 1. Load dataset
+# Load dataset from CSV file
 df = pd.read_csv("data/dataset.csv")
 
-# 2. Define inputs and outputs
+# Define input features and target outputs
 X = df[["cell_size_mm", "strut_diameter_mm", "porosity", "gradation_index"]].values
 y = df[["E_xx_GPa", "E_yy_GPa"]].values
 
-# 3. Split into training and test sets
+# Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# 4. Standardize data
+# Standardize input and output data
 x_scaler = StandardScaler()
 y_scaler = StandardScaler()
 
@@ -27,18 +27,18 @@ X_test = x_scaler.transform(X_test)
 y_train = y_scaler.fit_transform(y_train)
 y_test = y_scaler.transform(y_test)
 
-# 5. Convert to PyTorch tensors
+# Convert numpy arrays to PyTorch tensors
 X_train = torch.tensor(X_train, dtype=torch.float32)
 X_test = torch.tensor(X_test, dtype=torch.float32)
 y_train = torch.tensor(y_train, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.float32)
 
-# 6. Build model
+# Initialize MLP model, loss function and optimizer
 model = MLPModel(input_dim=X_train.shape[1], output_dim=y_train.shape[1])
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-# 7. Train model
+# Training process
 epochs = 500
 loss_history = []
 
@@ -56,7 +56,7 @@ for epoch in range(epochs):
     if (epoch + 1) % 50 == 0:
         print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.6f}")
 
-# 8. Evaluate model
+# Model evaluation
 model.eval()
 with torch.no_grad():
     test_pred = model(X_test)
@@ -65,7 +65,7 @@ with torch.no_grad():
 print("Training completed.")
 print("Test MSE:", test_loss.item())
 
-# 9. Save results text
+# Save training results to text file
 with open("results/training_results.txt", "w") as f:
     f.write("Week 5 basic reproduction result\n")
     f.write("Model: Basic MLP\n")
@@ -73,7 +73,7 @@ with open("results/training_results.txt", "w") as f:
     f.write("Training status: Completed\n")
     f.write(f"Test MSE: {test_loss.item()}\n")
 
-# 10. Plot training loss curve
+# Plot and save training loss curve
 plt.figure(figsize=(8, 5))
 plt.plot(loss_history)
 plt.xlabel("Epoch")
@@ -83,7 +83,7 @@ plt.grid(True)
 plt.savefig("results/loss_curve.png")
 plt.show()
 
-# 11. Plot predicted vs true values for E_xx_GPa
+# Plot predicted vs true values for E_xx_GPa
 plt.figure(figsize=(6, 6))
 plt.scatter(y_test[:, 0].numpy(), test_pred[:, 0].numpy())
 plt.xlabel("True E_xx_GPa (scaled)")
@@ -93,7 +93,7 @@ plt.grid(True)
 plt.savefig("results/pred_vs_true_exx.png")
 plt.show()
 
-# 12. Plot bar chart of test MSE
+# Plot test MSE bar chart
 plt.figure(figsize=(6, 4))
 plt.bar(["Test MSE"], [test_loss.item()])
 plt.ylabel("MSE")

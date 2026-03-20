@@ -12,12 +12,3 @@ Progress update:
 A simple neural network model was created in PyCharm and tested with dummy data as the first step of the modelling work.
 The code ran successfully, and the initial MSE result was 0.08075037529414072.
 Comments were added to improve code readability.
-Week 5 note
-
-This week, I started the modelling work based on the main paper in Python using PyCharm.
-I completed the initial code structure, including the dataset, model file, training script, and main program.
-I implemented a basic MLP model, completed the first training and testing process, and obtained a preliminary test MSE.
-I also generated several result figures, including the training loss curve, predicted-versus-true plot, and test error chart.
-
-At this stage, the model is a simplified version of the machine learning part of the paper.
-The next step is to make the implementation closer to the paper by refining the input and output definition and improving the model structure and training settings.

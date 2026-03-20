@@ -2,10 +2,13 @@ import torch
 import torch.nn as nn
 
 
+# Simple MLP for lattice property prediction
 class MLPModel(nn.Module):
     def __init__(self, input_dim, output_dim):
-        super().__init__()
-        self.network = nn.Sequential(
+        super(MLPModel, self).__init__()
+
+        # Build network layers
+        self.layers = nn.Sequential(
             nn.Linear(input_dim, 32),
             nn.ReLU(),
             nn.Linear(32, 32),
@@ -14,4 +17,6 @@ class MLPModel(nn.Module):
         )
 
     def forward(self, x):
-        return self.network(x)
+        # Forward pass through the network
+        out = self.layers(x)
+        return out
