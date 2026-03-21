@@ -94,15 +94,17 @@ with torch.no_grad():
     test_pred = model(X_test)
     test_loss = criterion(test_pred, y_test)
 
-print("Training completed.")
+print(f"Training completed for hidden_dim={hidden_dim}.")
+print("Final Validation Loss:", val_loss.item())
 print("Test MSE:", test_loss.item())
 
 # Save training results to text file
-with open("results/training_results.txt", "w") as f:
-    f.write("Week 5 basic reproduction result\n")
-    f.write("Model: Basic MLP\n")
-    f.write("Task: Input parameters to material-related outputs\n")
+with open(f"results/training_results_hidden_{hidden_dim}.txt", "w") as f:
+    f.write("Week 6 hidden neuron comparison result\n")
+    f.write(f"Model: Basic MLP (hidden_dim={hidden_dim})\n")
+    f.write("Task: Input parameters to target outputs\n")
     f.write("Training status: Completed\n")
+    f.write(f"Final Validation Loss: {val_loss.item()}\n")
     f.write(f"Test MSE: {test_loss.item()}\n")
 
 # Plot and save training loss curve
@@ -114,7 +116,7 @@ plt.ylabel("Loss")
 plt.title("Training and Validation Loss Curve")
 plt.legend()
 plt.grid(True)
-plt.savefig("results/loss_curve.png")
+plt.savefig(f"results/loss_curve_hidden_{hidden_dim}.png")
 plt.show()
 
 # Plot predicted vs true values for E_xx_GPa
@@ -124,7 +126,7 @@ plt.xlabel("True E_xx_GPa (scaled)")
 plt.ylabel("Predicted E_xx_GPa (scaled)")
 plt.title("Predicted vs True Values (E_xx_GPa)")
 plt.grid(True)
-plt.savefig("results/pred_vs_true_exx.png")
+plt.savefig(f"results/pred_vs_true_exx_hidden_{hidden_dim}.png")
 plt.show()
 
 # Plot test MSE bar chart
@@ -133,5 +135,5 @@ plt.bar(["Test MSE"], [test_loss.item()])
 plt.ylabel("MSE")
 plt.title("Test Error")
 plt.grid(True, axis="y")
-plt.savefig("results/test_mse_bar.png")
+plt.savefig(f"results/test_mse_bar_hidden_{hidden_dim}.png")
 plt.show()
