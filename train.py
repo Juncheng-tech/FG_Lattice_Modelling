@@ -45,7 +45,14 @@ y_val = torch.tensor(y_val, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.float32)
 
 # Initialize MLP model, loss function and optimizer
-model = MLPModel(input_dim=X_train.shape[1], output_dim=y_train.shape[1])
+hidden_dim = 50
+
+model = MLPModel(
+    input_dim=X_train.shape[1],
+    output_dim=y_train.shape[1],
+    hidden_dim=hidden_dim
+)
+
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
