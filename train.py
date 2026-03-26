@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import torch
 import torch.nn as nn
@@ -6,19 +7,24 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from model.mlp_model import MLPModel
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR = os.path.join(BASE_DIR, "results")
+os.makedirs(RESULTS_DIR, exist_ok=True)
+
 # Load dataset from CSV file
-df = pd.read_csv("data/dataset.csv")
+dataset_path = os.path.join(BASE_DIR, "data", "dataset.csv")
+df = pd.read_csv(dataset_path)
 
 # Define input features and target outputs
 X = df[["cell_size_mm", "strut_diameter_mm", "porosity", "gradation_index"]].values
 y = df[["E_xx_GPa", "E_yy_GPa"]].values
 
-# Split data into training+validation and test
+# training+validation and test
 X_temp, X_test, y_temp, y_test = train_test_split(
     X, y, test_size=0.15, random_state=42
 )
 
-# Split training+validation into training and validation
+# training and validation
 X_train, X_val, y_train, y_val = train_test_split(
     X_temp, y_temp, test_size=0.1765, random_state=42
 )
@@ -45,7 +51,7 @@ y_train = torch.tensor(y_train, dtype=torch.float32)
 y_val = torch.tensor(y_val, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.float32)
 
-# Initialize MLP model, loss function, and optimizer
+# Initialize MLP model, loss function and optimizer
 hidden_dim = 100
 
 model = MLPModel(
@@ -57,9 +63,8 @@ model = MLPModel(
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-# Gradient-related weight
-# Set to 0.0 for now because there is no true gradient label yet.
-lambda_grad = 0.0
+# Gradient regularization weight
+lambda_grad = 0.001
 
 # Training process
 epochs = 500
@@ -70,16 +75,11 @@ for epoch in range(epochs):
     # Training step
     model.train()
 
-    # Clone training input and enable gradient tracking
     X_train_batch = X_train.clone().detach().requires_grad_(True)
 
-    # Forward pass
     train_pred = model(X_train_batch)
-
-    # Output loss
     train_loss_output = criterion(train_pred, y_train)
 
-    # Gradient of outputs with respect to inputs
     grad_pred = torch.autograd.grad(
         outputs=train_pred,
         inputs=X_train_batch,
@@ -87,14 +87,12 @@ for epoch in range(epochs):
         create_graph=True
     )[0]
 
-    # Temporary gradient-related term
-    # This is only a placeholder for the simplified DANN prototype.
+    # Gradient regularization term
     train_loss_grad = torch.mean(grad_pred ** 2)
 
     # Total loss
     train_loss = train_loss_output + lambda_grad * train_loss_grad
 
-    # Backpropagation
     optimizer.zero_grad()
     train_loss.backward()
     optimizer.step()
@@ -109,27 +107,22 @@ for epoch in range(epochs):
     train_loss_history.append(train_loss.item())
     val_loss_history.append(val_loss.item())
 
-    # Print progress
     if (epoch + 1) % 50 == 0:
         print(
-            f"Epoch [{epoch + 1}/{epochs}], "
+            f"Epoch [{epoch+1}/{epochs}], "
             f"Train Loss: {train_loss.item():.6f}, "
             f"Output Loss: {train_loss_output.item():.6f}, "
             f"Grad Term: {train_loss_grad.item():.6f}, "
             f"Val Loss: {val_loss.item():.6f}"
         )
 
-# Final test evaluation
+# Model evaluation
 model.eval()
 
-# Enable gradient tracking on test input
 X_test_grad = X_test.clone().detach().requires_grad_(True)
-
-# Test prediction
 test_pred = model(X_test_grad)
 test_loss = criterion(test_pred, y_test)
 
-# Compute gradient on test set
 test_grad = torch.autograd.grad(
     outputs=test_pred,
     inputs=X_test_grad,
@@ -143,12 +136,20 @@ print("Test MSE:", test_loss.item())
 print(f"Gradient shape on test set: {test_grad.shape}")
 print("Example gradient (first sample):", test_grad[0])
 
+# Save model
+model_save_path = os.path.join(RESULTS_DIR, f"mlp_hidden_{hidden_dim}.pt")
+torch.save(model.state_dict(), model_save_path)
+print(f"Model saved to: {model_save_path}")
+print(f"File exists after save? {os.path.exists(model_save_path)}")
+
 # Save training results to text file
-with open(f"results/training_results_hidden_{hidden_dim}.txt", "w") as f:
+results_txt_path = os.path.join(RESULTS_DIR, f"training_results_hidden_{hidden_dim}.txt")
+with open(results_txt_path, "w", encoding="utf-8") as f:
     f.write("Week 6 hidden neuron comparison result\n")
-    f.write(f"Model: Simplified DANN prototype (hidden_dim={hidden_dim})\n")
+    f.write(f"Model: Gradient-regularized derivative-aware prototype (hidden_dim={hidden_dim})\n")
     f.write("Task: Input parameters to target outputs\n")
     f.write("Training status: Completed\n")
+    f.write(f"lambda_grad: {lambda_grad}\n")
     f.write("Derivative-aware setting: gradient computed by autograd\n")
     f.write(f"Final Validation Loss: {val_loss.item()}\n")
     f.write(f"Test MSE: {test_loss.item()}\n")
@@ -164,7 +165,7 @@ plt.ylabel("Loss")
 plt.title("Training and Validation Loss Curve")
 plt.legend()
 plt.grid(True)
-plt.savefig(f"results/loss_curve_hidden_{hidden_dim}.png")
+plt.savefig(os.path.join(RESULTS_DIR, f"loss_curve_hidden_{hidden_dim}.png"))
 plt.show()
 
 # Plot predicted vs true values for E_xx_GPa
@@ -174,7 +175,7 @@ plt.xlabel("True E_xx_GPa (scaled)")
 plt.ylabel("Predicted E_xx_GPa (scaled)")
 plt.title("Predicted vs True Values (E_xx_GPa)")
 plt.grid(True)
-plt.savefig(f"results/pred_vs_true_exx_hidden_{hidden_dim}.png")
+plt.savefig(os.path.join(RESULTS_DIR, f"pred_vs_true_exx_hidden_{hidden_dim}.png"))
 plt.show()
 
 # Plot test MSE bar chart
@@ -183,5 +184,5 @@ plt.bar(["Test MSE"], [test_loss.item()])
 plt.ylabel("MSE")
 plt.title("Test Error")
 plt.grid(True, axis="y")
-plt.savefig(f"results/test_mse_bar_hidden_{hidden_dim}.png")
+plt.savefig(os.path.join(RESULTS_DIR, f"test_mse_bar_hidden_{hidden_dim}.png"))
 plt.show()
